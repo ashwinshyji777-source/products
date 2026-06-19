@@ -27,7 +27,26 @@ function Card({ image, title, price, description, category, onAdd }) {
                 {description || "No description available."}
             </p>
 
-            <button type="button" onClick={() => onAdd && onAdd()}>
+            <button
+                type="button"
+                onClick={(event) => {
+                    const element = event.currentTarget
+                    const animation = element.animate(
+                        [
+                            { transform: 'rotate(0deg)' },
+                            { transform: 'rotate(360deg)' }
+                        ],
+                        {
+                            duration: 500,
+                            easing: 'ease-in-out'
+                        }
+                    )
+
+                    animation.onfinish = () => {
+                        if (onAdd) onAdd()
+                    }
+                }}
+            >
                 Add to Cart
             </button>
         </article>

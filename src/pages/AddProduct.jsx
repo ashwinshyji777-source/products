@@ -7,31 +7,49 @@ function AddProduct() {
   const [title, setTitle] = useState("")
   const [price, setPrice] = useState("")
   const [category, setCategory] = useState("")
-  const [image, setImage] = useState("")
+  const [imageFile, setImageFile] = useState(null)
   const [description, setDescription] = useState("")
+  const [stock, setStock] = useState(1)
   const [error, setError] = useState("")
+  const [saving, setSaving] = useState(false)
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
-    if (!title || !price || !category || !image) {
-      setError("Please fill in title, price, category, and image URL.")
+    if (!title || !price || !category || !imageFile) {
+      setError("Please fill in title, price, category, and select an image file.")
       return
     }
 
-    const newProduct = {
-      id: `local-${Date.now()}`,
-      title,
-      price: Number(price),
-      category,
-      image,
-      description,
+    setSaving(true)
+    setError("")
+
+    try {
+      const formData = new FormData()
+      formData.append("name", title)
+      formData.append("price", Number(price))
+      formData.append("category", category)
+      formData.append("description", description)
+      formData.append("stock", Number(stock))
+      formData.append("image", imageFile)
+
+      const response = await fetch("https://sample-e-1.onrender.com/product/addproduct", {
+        method: "POST",
+        body: formData,
+      })
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null)
+        throw new Error(data?.message || "Could not save product to API.")
+      }
+
+      navigate("/dashboard")
+    } catch (err) {
+      console.error(err)
+      setError(err.message || "Could not save product to API.")
+    } finally {
+      setSaving(false)
     }
-
-    const existing = JSON.parse(localStorage.getItem("localProducts") || "[]")
-    localStorage.setItem("localProducts", JSON.stringify([newProduct, ...existing]))
-
-    navigate("/dashboard")
   }
 
   return (
@@ -72,12 +90,22 @@ function AddProduct() {
           </label>
 
           <label>
-            Image URL
+            Product Image
             <input
-              type="text"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              placeholder="https://example.com/image.jpg"
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            />
+          </label>
+
+          <label>
+            Stock
+            <input
+              type="number"
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              placeholder="Stock quantity"
+              min="0"
             />
           </label>
 
@@ -93,8 +121,8 @@ function AddProduct() {
 
           {error && <p className="form-error">{error}</p>}
 
-          <button type="submit" className="submit-button">
-            Add Product
+          <button type="submit" className="submit-button" disabled={saving}>
+            {saving ? "Saving..." : "Add Product"}
           </button>
         </form>
       </div>

@@ -32,7 +32,7 @@ function Dashboard() {
           : []
 
         const localProducts = JSON.parse(localStorage.getItem("localProducts") || "[]")
-        setProducts([...localProducts, ...normalizedData.slice(0, 6)])
+        setProducts([...localProducts, ...normalizedData])
       } catch (err) {
         console.error(err)
         setError("Could not load products. Add them in Postman or check the API.")
@@ -44,7 +44,7 @@ function Dashboard() {
     fetchProducts()
   }, [])
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = () => {
     setCartCount((c) => c + 1)
   }
 
