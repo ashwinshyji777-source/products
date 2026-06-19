@@ -1,49 +1,22 @@
 import "./login.css"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
 
 function Login() {
-const [username, setUsername] = useState("")
-const [password, setPassword] = useState("")
-const [message, setMessage] = useState("")
+  const navigate = useNavigate()
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+    const [message, setMessage] = useState("")
 
 
-const handleLogin = async () => {
+const handleLogin = () => {
     if (!username || !password) {
         setMessage("❌ Please enter username and password")
         return
     }
 
-    try {
-        const response = await fetch(
-            "https://sample-e-1.onrender.com/login",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email: username,
-                    password: password,
-                }),
-            }
-        )
-
-        const data = await response.json()
-
-        if (response.ok) {
-            setMessage("✅ Login Successful!")
-
-            if (data.token) {
-                localStorage.setItem("token", data.token)
-            }
-        } else {
-            setMessage(data.message || "❌ Login Failed")
-        }
-    } catch (error) {
-        console.error(error)
-        setMessage("❌ Server error. Please try again.")
-    }
+    // navigate to dedicated loading page which performs the auth
+    navigate("/loading", { state: { email: username, password } })
 }
 
 return (
@@ -69,7 +42,11 @@ return (
                 Login
             </button>
 
+            
+
             <p>{message}</p>
+
+            
 
             <p>
                 Don't have an account?{" "}

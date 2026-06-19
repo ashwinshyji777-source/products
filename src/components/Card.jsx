@@ -2,7 +2,7 @@ import "./card.css"
 
 const API_BASE_URL = "https://sample-e-1.onrender.com"
 
-function Card({ image, title, price, description, category }) {
+function Card({ image, title, price, description, category, onAdd }) {
     const imageUrl = image
         ? image.startsWith("http")
             ? image
@@ -27,7 +27,9 @@ function Card({ image, title, price, description, category }) {
                 {description || "No description available."}
             </p>
 
-            <button type="button">Add to Cart</button>
+            <button type="button" onClick={() => onAdd && onAdd()}>
+                Add to Cart
+            </button>
         </article>
     )
 }

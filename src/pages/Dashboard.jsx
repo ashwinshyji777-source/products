@@ -7,6 +7,7 @@ function Dashboard() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [cartCount, setCartCount] = useState(0)
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -30,7 +31,8 @@ function Dashboard() {
           ? data.value
           : []
 
-        setProducts(normalizedData.slice(0, 6))
+        const localProducts = JSON.parse(localStorage.getItem("localProducts") || "[]")
+        setProducts([...localProducts, ...normalizedData.slice(0, 6)])
       } catch (err) {
         console.error(err)
         setError("Could not load products. Add them in Postman or check the API.")
@@ -42,9 +44,13 @@ function Dashboard() {
     fetchProducts()
   }, [])
 
+  const handleAddToCart = (product) => {
+    setCartCount((c) => c + 1)
+  }
+
   return (
     <div>
-      <Navbar />
+      <Navbar cartCount={cartCount} />
       <main
         style={{
           display: "flex",
@@ -69,6 +75,7 @@ function Dashboard() {
               price={product.price || "0"}
               description={product.description}
               category={product.category}
+              onAdd={() => handleAddToCart(product)}
             />
           ))
         )}
